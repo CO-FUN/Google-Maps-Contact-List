@@ -1,6 +1,6 @@
 # Contact List Collector Browser Extension
 
-## Suggestions for Function Calling and Real-Time Integrations
+## Usability of the project
 
 If you want to extend this extension with more advanced AI capabilities, consider:
 
