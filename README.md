@@ -120,17 +120,13 @@ extensions/
 - The extension sends scraped business data and user questions to an AI model (Mistral v3) via API.
 - The AI model answers based only on the provided data and its training, not by browsing the web in real time.
 
-### Why Use a Smaller Model Like Mistral v3?
+### Use a Smaller Language Models
 - **Efficiency:** Smaller models like Mistral v3 are fast and cost-effective for focused tasks.
 - **Contextual Reasoning:** When you provide structured data (like a table of businesses), Mistral v3 can efficiently "search" and reason over that data to answer specific queries, even without internet access.
 - **Control:** You decide exactly what data the model uses, making answers more predictable and secure. This reduces hallucination and ensures responses are based only on your provided, up-to-date data.
 - **Comparison:** Larger models (like GPT-4 or Grok 4) may have more general knowledge or web browsing, but for tasks where you want answers strictly from your provided data, a smaller model is often more reliable and less expensive. Large models may reference information from public websites if those sites were included in their training data, which is most likely for popular or well-crawled sites within the last 2 years before the model's training cut-off. However, this is not guaranteed for all sites or for the most recent content.
 - **Real-Time Web Lookup vs. Provided Data**
 - **LLM Models:** Some advanced models (like Grok 4) can browse the web in real time and use live data to answer questions. It is not currently supported in this extension. For Google Maps data extraction, real-time web browsing is not needed because all relevant business information (name, phone, website, address, etc.) is already available in the page's DOM and can be scraped directly. This makes the process faster, more reliable, and less dependent on external web content.
-
-### Relation to Function Calling
-- **Function Calling (in LLMs):** Some AI models can trigger specific functions in your code (e.g., fetch a website, run a calculation) based on user intent. This is called "function calling."
-- **This Extension's Approach:** Instead of letting the AI trigger code, this solution gives the model all the structured business data it needs up front. The model then "acts" as if it is searching or filtering, but does so entirely within its own reasoning, based on the data you provide. This approach is similar to function calling in that the model is guided to answer using only the provided data, but it is simpler, more secure, and fully under your control.
 
 ---
 
