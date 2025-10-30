@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Contact List Collector",
+    "version": "1.0",
+    "description": "Collects contact information extension by Sintija Birgele",
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": [
+      "https://api.mistral.ai/*",
+      "https://api.telegram.org/*"
+    ],
+    "action": {
+      "default_popup": "index.html"
+    },
+    "icons": {
+      "16": "map.png",
+      "48": "map.png",
+      "128": "map.png"
+    }
+  }

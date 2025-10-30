@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact List Collector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-start: #0f1729;
+      --bg-end: #1a1f3a;
+      --card: #ffffff;
+      --panel-grad-start: #6366f1;
+      --panel-grad-end: #4338ca;
+      --text: #1e293b;
+      --muted: #64748b;
+      --btn-grad-start: #818cf8;
+      --btn-grad-end: #6366f1;
+      --btn-hover: #a5b4fc;
+      --pill: #1e293b;
+      --pill-border: rgba(255,255,255,0.12);
+      --accent: #1d3c6e;
+    }
+
+    /* Background approximating the screenshot */
+    html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #102e67;
+      min-width: 940px;
+      padding: 40px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* static light gradient overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: 
+        radial-gradient(circle 650px at 12% 18%, rgb(59 100 160 / 45%), transparent 60%), radial-gradient(circle 800px at 88% 82%, rgba(147, 197, 253, 0.40), transparent 65%), radial-gradient(circle 700px at 45% 65%, rgba(129, 140, 248, 0.38), transparent 62%), radial-gradient(circle 600px at 78% 25%, rgba(196, 181, 253, 0.35), transparent 58%), radial-gradient(circle 750px at 25% 88%, rgba(99, 102, 241, 0.42), transparent 63%);
+      opacity: 1;
+      filter: blur(90px);
+    }
+
+    /* static triangle pattern overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.10;
+      background-image: url('data:image/svg+xml;utf8,<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,0 32,16 0,16" fill="white" fill-opacity="0.30"/></svg>');
+      background-size: 32px 44px;
+      background-repeat: repeat;
+      mix-blend-mode: lighten;
+    }
+
+    .app-card {
+      background: var(--card);
+      border-radius: 22px;
+      width: 900px;
+      max-width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+      overflow: hidden;
+    }
+
+    .app-header {
+      padding: 28px 32px 18px 62px;
+    }
+    .app-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.2px;
+      margin: 0 0 8px 0;
+    }
+    .app-subtitle {
+      color: #64748b;
+      opacity: .9;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Match input placeholder font to .app-subtitle */
+    input::placeholder {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      font-weight: 500;
+    }
+
+    .app-content {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      min-height: 400px;
+    }
+
+    .left-col {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .left-col img.map-hero {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+    }
+    .left-col img.pin-logo{
+      position: absolute;
+      right: 38px;
+      top: 30px;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      z-index: 2;
+    }
+
+    .right-col {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      padding: 28px 28px 28px 0;
+      color: #e6ecff;
+      justify-content: start;
+      align-items: center;
+      z-index:10;
+    }
+
+    /* Status pill styled like input */
+    #message {
+      background: #ffa800;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 10px 16px 10px 44px;
+      font-size: 14px;
+      color: #f1f5f9;
+      position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #message::before{
+      content: '';
+      position: absolute;
+      left: 16px; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ffcf5b;
+      box-shadow: 0 0 0 4px rgba(255,207,91,0.15);
+    }
+
+    .actions{
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .button {
+      appearance: none;
+      border: none;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #1f91f1fc;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255,255,255,0.20);
+    }
+
+    #sendTelegramButton {
+      background: #156fa3;
+      color: #fff;
+      border: none;
+      min-width: 120px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 24px;
+      box-shadow: 0 4px 16px rgba(34,158,217,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+    #sendTelegramButton:hover {
+      box-shadow: 0 8px 24px rgba(34,158,217,0.28);
+      transform: translateY(-2px) scale(1.03);
+    }
+    #sendTelegramButton:active {
+      transform: scale(0.98);
+    }
+    #sendTelegramButton .telegram-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .button:hover { 
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+      background: #273ec2;
+      transform: translateY(-2px);
+    }
+    .button:active { transform: translateY(0px); }
+    .button:disabled{ opacity: .6; cursor: not-allowed; }
+
+    /* Hidden filename input to match screenshot (still present for logic) */
+    #filenameInput{ display:none; }
+
+    /* Results table hidden by default to match screenshot */
+    #resultsTable{ display: none; }
+
+    .app-footer{
+      background: #122f7f;
+      color: #94a3b8;
+      padding: 14px 24px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .app-footer a{ color: #60a5fa; text-decoration: none; font-weight: 600; }
+    .app-footer a:hover{ text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="app-card">
+    <div class="app-header">
+      <h1 class="app-title">Contact List Collector</h1>
+      <p class="app-subtitle">Professional data extraction tool</p>
+    </div>
+
+    <div class="app-content">
+      <div class="left-col">
+        <img src="maps.png" alt="Italy map" class="map-hero" />
+        <img src="map.png" alt="Logo" class="pin-logo" />
+      </div>
+
+      <div class="right-col">
+        <div style="position:absolute;bottom:10px;right:18px;font-size:11px;color:#64748b;z-index:10;align-self:flex-end;">
+          Bird animation by <a href="https://codepen.io/YusukeNakaya" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline;">Yusuke Nakaya</a>
+        </div>
+        <div style="width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <div id="message">Checking URL...</div>
+            <button id="settingsButton" style="background:none;border:none;cursor:pointer;padding:0 0 0 8px;outline:none;display:flex;align-items:center;" title="Settings">
+              <img src="4281154.png" alt="Settings" style="height:35px;width:35px;object-fit:contain;" />
+            </button>
+          </div>
+          <div id="telegramSettings" style="width:100%;max-width:420px;display:none;flex-direction:column;gap:4px;margin-top:4px;align-items:center;">
+            <input type="password" id="telegramBotToken" placeholder="Telegram Bot Token" style="width:220px;padding:8px 14px;border-radius:18px;border:1px solid #cbd5e1;font-size:14px;" value="TELEGRAM_BOT_TOKEN" />
+            <input type="text" id="telegramChatId" placeholder="Telegram Chat ID" style="width:220px;padding:8px 14px;border-radius:18px;border:1px solid #cbd5e1;font-size:14px;" value="TELEGRAM_CHAT_ID" />
+          </div>
+        </div>
+        <div style="width:100%;margin-top:18px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;">
+          <div style="display:flex;width:100%;max-width:420px;align-items:center;gap:8px;">
+            <input type="text" id="qaInput" placeholder="Ask AI about the companies..." style="flex:1;padding:12px 14px;border-radius:18px;border:1px solid #cbd5e1;font-size:15px;" />
+            <button id="qaButton" class="button" style="min-width:48px;padding:8px 14px 8px 0;font-size:15px;height:38px;line-height:1;border-radius:18px;display:flex;align-items:center;justify-content:center;background:none !important;box-shadow:none !important;">
+              <img src="439328.png" alt="Ask" style="height:32px;width:32px;object-fit:contain;" />
+            </button>
+          </div>
+          <a id="downloadCsvButton" href="#" style="margin:4px 0 0 0;text-decoration:underline;color:#1e293b;background:none;border:none;padding:0 0 0 8px;font-size:13px;cursor:pointer;align-self:flex-start;">Download Results (CSV)</a>
+          <div id="qaAnswer" style="width:100%;max-width:320px;color:#1e293b;padding:12px 12px;border-radius:8px;"></div>
+          <!-- Bird animation: hidden by default, show via JS when sending to Telegram -->
+          <!-- Created by Yusuke Nakaya: https://codepen.io/YusukeNakaya -->
+          <div id="sky" style="display:none; width:120px; height:120px; position:relative; align-self:center;">
+            <div class="bird">
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="wind"></div>
+              <div class="bird_body">
+                <div class="bird_head"></div>
+                <div class="bird_wing_left">
+                  <div class="bird_wing_left_top"></div>
+                </div>
+                <div class="bird_wing_right">
+                  <div class="bird_wing_right_top"></div>
+                </div>
+                <div class="bird_tail_left"></div>
+                <div class="bird_tail_right"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-footer">
+      <span>All rights reserved</span>
+      <a href="https://cofundigital.com" target="_blank" rel="noreferrer noopener">CO-FUN Digital</a> 2025
+    </div>
+  </div>
+
+  <!-- Hidden but kept for JS logic -->
+  <input type="text" id="filenameInput" class="input" placeholder="Enter file name" />
+
+  <table id="resultsTable" style="display:none;">
+    <thead>
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="script.js"></script>
+</style>
+<style>
+#sky {
+  margin-top: -30px;
+  perspective: 400px;
+  filter: drop-shadow(0px 80px 10px rgba(0, 0, 0, 0.18));
+  position: relative;
+  z-index: 2;
+}
+#sky div { transform-style: preserve-3d; }
+#sky .bird {
+  animation: fly 10s linear infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#sky .wind {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  height: 200px;
+  margin-left: -2px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+#sky .wind:nth-child(1)  { transform: translate3d(-80px, -60px,  40px) rotateY(90deg); }
+#sky .wind:nth-child(2)  { transform: translate3d( 60px, -40px, -30px) rotateY(90deg); }
+#sky .wind:nth-child(3)  { transform: translate3d(-50px,  50px,  60px) rotateY(90deg); }
+#sky .wind:nth-child(4)  { transform: translate3d( 90px,  30px, -50px) rotateY(90deg); }
+#sky .wind:nth-child(5)  { transform: translate3d(-30px,  80px,  20px) rotateY(90deg); }
+#sky .wind:nth-child(6)  { transform: translate3d( 40px, -90px,  70px) rotateY(90deg); }
+#sky .wind:nth-child(7)  { transform: translate3d(-70px,  20px, -60px) rotateY(90deg); }
+#sky .wind:nth-child(8)  { transform: translate3d( 20px,  70px,  30px) rotateY(90deg); }
+#sky .wind:nth-child(9)  { transform: translate3d(-60px, -80px, -40px) rotateY(90deg); }
+#sky .wind:nth-child(10) { transform: translate3d( 80px,  60px,  50px) rotateY(90deg); }
+#sky .wind::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 300px;
+  background: rgba(100, 200, 255, 0.18);
+  border-radius: 999px;
+  transform: translateY(-300px);
+  animation: wind 2.2s 1.2s linear infinite;
+}
+#sky .wind:nth-child(2)::before  { background: rgba(100, 200, 220, 0.18); animation-duration: 1.8s; animation-delay: 2.1s; }
+#sky .wind:nth-child(3)::before  { background: rgba(100, 200, 210, 0.18); animation-duration: 2.5s; animation-delay: 1.5s; }
+#sky .wind:nth-child(4)::before  { background: rgba(100, 200, 230, 0.18); animation-duration: 1.6s; animation-delay: 2.7s; }
+#sky .wind:nth-child(5)::before  { background: rgba(100, 200, 240, 0.18); animation-duration: 2.1s; animation-delay: 1.9s; }
+#sky .wind:nth-child(6)::before  { background: rgba(100, 200, 200, 0.18); animation-duration: 2.3s; animation-delay: 2.3s; }
+#sky .wind:nth-child(7)::before  { background: rgba(100, 200, 225, 0.18); animation-duration: 1.7s; animation-delay: 2.5s; }
+#sky .wind:nth-child(8)::before  { background: rgba(100, 200, 215, 0.18); animation-duration: 2.4s; animation-delay: 1.7s; }
+#sky .wind:nth-child(9)::before  { background: rgba(100, 200, 235, 0.18); animation-duration: 1.9s; animation-delay: 2.2s; }
+#sky .wind:nth-child(10)::before { background: rgba(100, 200, 205, 0.18); animation-duration: 2.0s; animation-delay: 2.0s; }
+#sky .bird_body {
+  position: relative;
+  width: 30px;
+  height: 40px;
+  background: #b3e5fc;
+  border-radius: 16px 16px 20px 20px / 18px 18px 24px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+#sky .bird_head {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  border-right: 15px solid transparent;
+  border-bottom: 30px solid #4fc3f7;
+  border-left: 15px solid transparent;
+  width: 0; height: 0;
+  transform-origin: 50% 100%;
+  transform: rotateX(-20deg);
+}
+#sky .bird_wing_left {
+  position: absolute;
+  left: -30px;
+  height: 30px;
+  border-right: 30px solid #81d4fa;
+  border-bottom: 10px solid transparent;
+  transform-origin: 100% 0;
+  animation: wingLeft 1s cubic-bezier(0.360, 0.100, 0.160, 1.000) infinite alternate;
+}
+#sky .bird_wing_left_top {
+  position: absolute;
+  left: -30px;
+  border-right: 30px solid #b3e5fc;
+  border-bottom: 30px solid transparent;
+  transform-origin: 100% 0;
+  animation: wingLeft 1s cubic-bezier(0.545, 0.080, 0.520, 0.975) infinite alternate;
+}
+#sky .bird_wing_right {
+  position: absolute;
+  left: 30px;
+  height: 30px;
+  border-left: 30px solid #81d4fa;
+  border-bottom: 10px solid transparent;
+  transform-origin: 0 0;
+  animation: wingRight 1s cubic-bezier(0.360, 0.100, 0.160, 1.000) infinite alternate;
+}
+#sky .bird_wing_right_top {
+  position: absolute;
+  border-left: 30px solid #b3e5fc;
+  border-bottom: 30px solid transparent;
+  transform-origin: 0 0;
+  animation: wingRight 1s cubic-bezier(0.545, 0.080, 0.520, 0.975) infinite alternate;
+}
+#sky .bird_tail_left {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  border-right: 30px solid transparent;
+  border-top: 40px solid #0288d1;
+  width: 0; height: 0;
+  transform-origin: 50% 0;
+  transform: rotateX(-20deg);
+}
+#sky .bird_tail_right {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  border-left: 30px solid transparent;
+  border-top: 40px solid #0288d1;
+  width: 0; height: 0;
+  transform-origin: 50% 0;
+  transform: rotateX(-20deg);
+}
+@keyframes fly {
+  0% { transform: rotateX(-120deg) rotateZ(0deg) rotateX(10deg) translate(-50%, -50%); }
+  100% { transform: rotateX(-120deg) rotateZ(360deg) rotateX(10deg) translate(-50%, -50%); }
+}
+@keyframes wingLeft {
+  0% { transform: rotateY(-40deg); }
+  100% { transform: rotateY(40deg); }
+}
+@keyframes wingRight {
+  0% { transform: rotateY(40deg); }
+  100% { transform: rotateY(-40deg); }
+}
+@keyframes wind {
+  0% { transform: translateY(-300px); }
+  100% { transform: translateY(200px); }
+}
+</style>
+</body>
+</html>
