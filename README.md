@@ -1,4 +1,4 @@
-# Contact List Collector Browser Extension
+# FREE Contact List Collector Browser Extension
 
 ## Usability of the project
 
