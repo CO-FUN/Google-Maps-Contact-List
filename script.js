@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- Original popup logic for scraping, download, etc. ---
     chrome.tabs.query({active: true, currentWindow: true}, (activeTabs) => {
         const activeTab = activeTabs[0];
         const scrapeButton = document.getElementById('actionButton');
